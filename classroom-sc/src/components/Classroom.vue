@@ -127,7 +127,7 @@ export default defineComponent({
   setup(props) {
     const datas = ref([]);
     async function getAsyncData() {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${props.sheetUrl}/values/Sheet1!A1:L${(window as any).totalUpdateRow + 1}?key=AIzaSyBPpdmh3iwG_qTnd62h6USpum7QLsufm2w`;
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${props.sheetUrl}/values/Sheet1!A1:L${(window as any).totalUpdateRow + 1}?key=AIzaSyDc_96i9EcWRpXA4aD-dzocHg6QdGJ1QJU`;
       const response = await fetch(url, {
         method: "GET",
       });
