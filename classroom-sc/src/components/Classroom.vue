@@ -13,7 +13,12 @@
     </div>
     <!-- pointClassroom -->
     <div class="pointClassroom">
-      <input v-show="!teacherMode" v-model="password" type="password" />
+      <input
+        ref="inputPassword"
+        v-show="!teacherMode"
+        v-model="password"
+        type="password"
+      />
       <button
         v-show="!teacherMode"
         @click="checkPassword(password)"
@@ -40,19 +45,8 @@
         -1 Exp
       </button>
       <button
-        v-show="allowSave"
-        id="authorize_button"
-        onclick="handleAuthClick()"
-        class="btn primary"
-      >
-        Save
-      </button>
-      <button
-        v-show="teacherMode && !allowSave"
-        @click="
-          getResult(datas);
-          allowSave = true;
-        "
+        v-show="teacherMode"
+        @click="updateResult(datas)"
         class="btn primary"
       >
         Update
@@ -99,7 +93,7 @@ import ModalRadar from "./ModalRadar.vue";
 
 export default defineComponent({
   name: "Classroom",
-  props: ["sheetUrl"],
+  props: ["sheetUrl", "scriptUrl"],
   components: {
     Seat,
     ModalTp,
@@ -108,7 +102,6 @@ export default defineComponent({
   data() {
     return {
       password: "",
-      allowSave: false,
       teacherMode: false,
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
@@ -125,42 +118,37 @@ export default defineComponent({
     };
   },
   setup(props) {
-    const datas = ref([]);
-    async function getAsyncData() {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${props.sheetUrl}/values/Sheet1!A1:L${(window as any).totalUpdateRow + 1}?key=AIzaSyDc_96i9EcWRpXA4aD-dzocHg6QdGJ1QJU`;
-      // const url = `https://sheets.googleapis.com/v4/spreadsheets/${props.sheetUrl}/values/Sheet1!A1:L${(window as any).totalUpdateRow + 1}?key=AIzaSyBPpdmh3iwG_qTnd62h6USpum7QLsufm2w`;
-      const response = await fetch(url, {
-        method: "GET",
-      });
-      return response.json();
-    }
+    const inputPassword = ref();
+    let datas = ref([]);
+    const url = `https://docs.google.com/spreadsheets/d/${props.sheetUrl}/gviz/tq?tqx=out:json`;
 
-    getAsyncData().then((data: any) => {
-      const values = data.values;
-      const keys: string[] = values[0];
-      const results = values.map((data: any) => {
-        const obj: any = {};
-        data.forEach((d: any, i: number) => {
-          if (isNaN(d)) {
-            obj[keys[i]] = d;
-          } else {
-            obj[keys[i]] = +d;
-          }
-          obj.tp = 0;
-          obj["absent"] = false;
+    function jsonToObject(rep: any) {
+      const data = JSON.parse(rep.substring(47).slice(0, -2));
+      const cols = data.table.cols;
+      const results = data.table.rows.map((row: any) => {
+        const obj = {} as any;
+        row.c.forEach((data: any, index: number) => {
+          obj[cols[index].label] = data.v;
         });
+        obj.tp = 0;
+        obj["absent"] = false;
         return obj;
       });
-      results.shift();
       results.sort((a: any, b: any) => a.seat - b.seat);
-      console.log(results);
-      datas.value = results;
-    });
+      return results;
+    }
 
-    return { datas };
+    fetch(url + "&sheet=Sheet1")
+      .then((res) => res.text())
+      .then((rep) => (datas.value = jsonToObject(rep)));
+
+    return { inputPassword, datas, scriptUrl: props.scriptUrl };
+  },
+  mounted() {
+    this.inputPassword.focus();
   },
   methods: {
-    getResult(datas: any) {
+    updateResult(datas: any) {
       const sortByDefault = [...datas].sort((a: any, b: any) => a.no - b.no);
       const results = sortByDefault.map((data: any) => {
         const obj: any = [
@@ -175,18 +163,17 @@ export default defineComponent({
         ];
         return obj;
       });
-      results.unshift([
-        "exp",
-        "s1",
-        "s2",
-        "s3",
-        "s4",
-        "s5",
-        "s6",
-        this.finalResult.title,
-      ]);
-      console.log(results);
-      (window as any).gsResults = results;
+
+      fetch(this.scriptUrl, {
+        method: "POST",
+        mode: "no-cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        body: JSON.stringify({ data: results }),
+      }).then(() => alert('Response'));
     },
     allTp(val: number) {
       this.datas.forEach((d: any) => {

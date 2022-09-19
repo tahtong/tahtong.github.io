@@ -4,7 +4,10 @@
       <button
         v-for="n in ['3M', '4H', '4M', '5H', '5K', '5M']"
         :key="n"
-        @click="selectedClassroom = n"
+        @click="
+          selectedClassroom = n;
+          inputPassword.focus();
+        "
         class="btn primary"
       >
         {{ n }}
@@ -14,8 +17,9 @@
     <br />
     <section>
       <input
+        ref="inputPassword"
         v-model="password"
-        :disabled="selectedClassroom == ''"
+        :style="{ 'opacity': selectedClassroom === '' ? 0.2 : 1 }"
         type="password"
       />
       <button
@@ -30,15 +34,23 @@
     <br />
     <p v-if="isPasswordWrong">Wrong Password!</p>
   </div>
-  <Classroom v-else :sheetUrl="selectedSheetUrl" />
+  <Classroom
+    v-else
+    :sheetUrl="selectedSheetUrl"
+    :scriptUrl="selectedScriptUrl"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import Classroom from "./components/Classroom.vue";
 
 export default defineComponent({
   name: "App",
+  setup() {
+    const inputPassword = ref();
+    return { inputPassword };
+  },
   data() {
     return {
       selectedClassroom: "",
@@ -48,36 +60,43 @@ export default defineComponent({
       sheetUrls: [
         {
           classroom: "3M",
-          totalStudent: 26,
           url: "1G5YN2BbiOm1C4d-f8lfSu-5BqXCQbTz4mqfyuWxFVrA",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbx83cG9Qu1wtQUAHxWzHHQMCmgk7Y1mlEjwvUWQpF-xdwk-Q58kwS2jXDiy5y1zikQx/exec",
         },
         {
           classroom: "4H",
-          totalStudent: 23,
           url: "1Oc1wyRSL77jriyCf2-3aHKPdQbNWEctzrK2uzm_F-FQ",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbwToRyVVFuamLI4XcXoUwJVVNsxxEcNMm4zomH_AjCK2evhH2NMeL3dbz1gTaU-IUKNJw/exec",
         },
         {
           classroom: "4M",
-          totalStudent: 24,
           url: "1dnYsdsb1D-uBf4e3Tl0UyFi4JGe9shy3Un7mX4qyX9k",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbwBq0UogO2a_mtdRby4McTm6Ch-RPNHxyyV1s70H_D7cDgV5WWdKD04jHBgAB9l03yzfw/exec",
         },
         {
           classroom: "5H",
-          totalStudent: 24,
           url: "1h7I_XLNA4NnL91nUENt9N2tw3-xrqgxHVXm3dCaVlE4",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbxIyki3IG6zYOKxchMpVVc_sCSG84t4aiBcIdUA-W4C4TuXznBK7HSKqKQlZ4nCFnFB/exec",
         },
         {
           classroom: "5K",
-          totalStudent: 27,
           url: "1h_Qk_o_fVGqwh-lbtqdbX8Pq7zYTDOGUCjFNutlBpO8",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbyPR7proIeJ1TLFIPd21XiddFTJM2e68vI_i19xyQgQA_DBQBt0xauPFMvwljWgMRftug/exec",
         },
         {
           classroom: "5M",
-          totalStudent: 26,
           url: "1ov-4Eq_jA-cNI8ZP_7Pjav-4vyZzeSeTTZkAgUMHwPA",
+          scriptUrl:
+            "https://script.google.com/macros/s/AKfycbyPqew4HUWG1g0DSDvyqkuxOJZRIhZMCDzU5mZdbCxSZHIkn8Y3mviJEQHnuS57kJ9u/exec",
         },
       ],
       selectedSheetUrl: "",
+      selectedScriptUrl: "",
     };
   },
   components: {
@@ -99,9 +118,8 @@ export default defineComponent({
           (s: any) => s.classroom === this.selectedClassroom
         )[0];
         this.selectedSheetUrl = filteredClassroom.url;
+        this.selectedScriptUrl = filteredClassroom.scriptUrl;
         document.title = selected + " 发展联盟";
-        (window as any).gsUrl = this.selectedSheetUrl;
-        (window as any).totalUpdateRow = filteredClassroom.totalStudent;
       } else {
         this.isPasswordWrong = true;
       }
