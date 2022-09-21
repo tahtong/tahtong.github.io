@@ -1,57 +1,47 @@
 <template>
   <div class="header">
-    <!-- subject -->
-    <div class="subject">
-      <div v-show="teacherMode" class="title">
+    <!-- <div v-show="teacherMode" class="title">
         <span>课题</span>
         <input v-model="finalResult.title" type="text" />
-      </div>
-      <div v-show="teacherMode" class="title">
-        <span>TP</span>
-        <input v-model="selectedTp" type="number" max="6" min="0" />
-      </div>
+      </div> -->
+    <div v-show="teacherMode" style="margin-right:10px">
+      <span>TP </span>
+      <input v-model="selectedTp" type="number" max="6" min="0" />
     </div>
-    <!-- pointClassroom -->
-    <div class="pointClassroom">
-      <input
-        ref="inputPassword"
-        v-show="!teacherMode"
-        v-model="password"
-        type="password"
-      />
-      <button
-        v-show="!teacherMode"
-        @click="checkPassword(password)"
-        class="btn primary"
-      >
-        Run
-      </button>
+    <input
+      ref="inputPassword"
+      v-show="!teacherMode"
+      v-model="password"
+      type="password"
+    />
+    <button
+      v-show="!teacherMode"
+      @click="checkPassword(password)"
+      class="btn primary"
+    >
+      Run
+    </button>
 
-      <button
-        v-show="teacherMode"
-        @click="allTp(selectedTp)"
-        class="btn primary plus"
-      >
-        {{ selectedTp }} Tp
-      </button>
-      <button v-show="teacherMode" @click="allExp(1)" class="btn primary plus">
-        +1 Exp
-      </button>
-      <button
-        v-show="teacherMode"
-        @click="allExp(-1)"
-        class="btn primary minus"
-      >
-        -1 Exp
-      </button>
-      <button
-        v-show="teacherMode"
-        @click="updateResult(datas)"
-        class="btn primary"
-      >
-        Update
-      </button>
-    </div>
+    <button
+      v-show="teacherMode"
+      @click="allTp(selectedTp)"
+      class="btn primary plus"
+    >
+      {{ selectedTp }} Tp
+    </button>
+    <button v-show="teacherMode" @click="allExp(1)" class="btn primary plus">
+      +1 Exp
+    </button>
+    <button v-show="teacherMode" @click="allExp(-1)" class="btn primary minus">
+      -1 Exp
+    </button>
+    <button
+      v-show="teacherMode"
+      @click="updateResult(datas)"
+      class="btn primary"
+    >
+      Update
+    </button>
   </div>
 
   <!-- seat -->
@@ -114,7 +104,7 @@ export default defineComponent({
       selectedSkills: [0, 0, 0, 0, 0, 0],
       isShowResult: false,
       labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "德行"],
-      selectedTp: 1,
+      selectedTp: 4,
     };
   },
   setup(props) {
@@ -130,8 +120,6 @@ export default defineComponent({
         row.c.forEach((data: any, index: number) => {
           obj[cols[index].label] = data.v;
         });
-        obj.tp = 0;
-        obj["absent"] = false;
         return obj;
       });
       results.sort((a: any, b: any) => a.seat - b.seat);
@@ -160,11 +148,15 @@ export default defineComponent({
           data.s5,
           data.s6,
           data.tp,
+          data.absent,
         ];
         return obj;
       });
+      const url = `https://script.google.com/macros/s/${this.scriptUrl}/exec`;
 
-      fetch(this.scriptUrl, {
+      console.log(results);
+
+      fetch(url, {
         method: "POST",
         mode: "no-cors",
         cache: "no-cache",
@@ -173,7 +165,7 @@ export default defineComponent({
         },
         redirect: "follow",
         body: JSON.stringify({ data: results }),
-      }).then(() => alert('Response'));
+      }).then(() => alert("Response"));
     },
     allTp(val: number) {
       this.datas.forEach((d: any) => {
@@ -259,25 +251,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.subject {
-  display: flex;
-  align-items: center;
-  height: 50px;
-
-  span {
-    margin-right: 10px;
-  }
-
-  .title {
-    margin-right: 10px;
-  }
-  .tp {
-  }
-}
-.pointClassroom {
   button ~ button {
     margin-left: 5px;
   }

@@ -62,37 +62,37 @@ export default defineComponent({
           classroom: "3M",
           url: "1G5YN2BbiOm1C4d-f8lfSu-5BqXCQbTz4mqfyuWxFVrA",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbx83cG9Qu1wtQUAHxWzHHQMCmgk7Y1mlEjwvUWQpF-xdwk-Q58kwS2jXDiy5y1zikQx/exec",
+            "AKfycbxfFzzsmO51c0vrSOZcdUbBYQ2pb0Vq2o6U98N92TnXnbyNEZzWOfKUmso78sJtVj0l",
         },
         {
           classroom: "4H",
           url: "1Oc1wyRSL77jriyCf2-3aHKPdQbNWEctzrK2uzm_F-FQ",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbwToRyVVFuamLI4XcXoUwJVVNsxxEcNMm4zomH_AjCK2evhH2NMeL3dbz1gTaU-IUKNJw/exec",
+            "AKfycbwToRyVVFuamLI4XcXoUwJVVNsxxEcNMm4zomH_AjCK2evhH2NMeL3dbz1gTaU-IUKNJw",
         },
         {
           classroom: "4M",
           url: "1dnYsdsb1D-uBf4e3Tl0UyFi4JGe9shy3Un7mX4qyX9k",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbwBq0UogO2a_mtdRby4McTm6Ch-RPNHxyyV1s70H_D7cDgV5WWdKD04jHBgAB9l03yzfw/exec",
+            "AKfycbxP3M7RxjahdEzmkjfQvFgc62leMcFGSRdylfU1cgZuw2Bv9J-Tzao4z0d9wfJmj3A_rQ",
         },
         {
           classroom: "5H",
           url: "1h7I_XLNA4NnL91nUENt9N2tw3-xrqgxHVXm3dCaVlE4",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbxIyki3IG6zYOKxchMpVVc_sCSG84t4aiBcIdUA-W4C4TuXznBK7HSKqKQlZ4nCFnFB/exec",
+            "AKfycbxtsO4E6XdEaYqiLwr35s8G4GWw9b_9xLkTVh3AEwhtayf9N-kZFWYqLt8SLvH9cpFe",
         },
         {
           classroom: "5K",
           url: "1h_Qk_o_fVGqwh-lbtqdbX8Pq7zYTDOGUCjFNutlBpO8",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbyPR7proIeJ1TLFIPd21XiddFTJM2e68vI_i19xyQgQA_DBQBt0xauPFMvwljWgMRftug/exec",
+            "AKfycbyPR7proIeJ1TLFIPd21XiddFTJM2e68vI_i19xyQgQA_DBQBt0xauPFMvwljWgMRftug",
         },
         {
           classroom: "5M",
           url: "1ov-4Eq_jA-cNI8ZP_7Pjav-4vyZzeSeTTZkAgUMHwPA",
           scriptUrl:
-            "https://script.google.com/macros/s/AKfycbyPqew4HUWG1g0DSDvyqkuxOJZRIhZMCDzU5mZdbCxSZHIkn8Y3mviJEQHnuS57kJ9u/exec",
+            "AKfycbx5PCY_SgDwXyO8r9cnWUCrdMSqRaNbsb-A3VlcvXyRwlruetniiQeG51x1ygSPbgDQ",
         },
       ],
       selectedSheetUrl: "",
