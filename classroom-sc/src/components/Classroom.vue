@@ -1,10 +1,10 @@
 <template>
   <div class="header">
-    <!-- <div v-show="teacherMode" class="title">
-        <span>课题</span>
-        <input v-model="finalResult.title" type="text" />
-      </div> -->
-    <div v-show="teacherMode" style="margin-right:10px">
+    <div v-show="teacherMode" style="margin-right: 10px">
+      <span>Evaluate </span>
+      <input v-model="evaluateCount" type="number" min="1" />
+    </div>
+    <div v-show="teacherMode" style="margin-right: 10px">
       <span>TP </span>
       <input v-model="selectedTp" type="number" max="6" min="0" />
     </div>
@@ -61,6 +61,8 @@
   <!-- ModalTp -->
   <ModalTp
     :open="isOpenModalTp"
+    :evaluateCount="evaluateCount"
+    :selectedStudent="selectedStudent"
     @close="isOpenModalTp = false"
     @selectTp="selectTp"
   />
@@ -95,9 +97,6 @@ export default defineComponent({
       teacherMode: false,
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
-      finalResult: {
-        title: "",
-      },
       isOpenModalTp: false,
       selectedStudent: Object as any,
       isOpenModalRadar: false,
@@ -105,6 +104,7 @@ export default defineComponent({
       isShowResult: false,
       labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "德行"],
       selectedTp: 4,
+      evaluateCount: 2,
     };
   },
   setup(props) {
@@ -120,6 +120,7 @@ export default defineComponent({
         row.c.forEach((data: any, index: number) => {
           obj[cols[index].label] = data.v;
         });
+        obj.tp = 0;
         return obj;
       });
       results.sort((a: any, b: any) => a.seat - b.seat);
@@ -147,14 +148,14 @@ export default defineComponent({
           data.s4,
           data.s5,
           data.s6,
-          data.tp,
+          data.tpStr,
           data.absent,
         ];
         return obj;
       });
       const url = `https://script.google.com/macros/s/${this.scriptUrl}/exec`;
 
-      console.log(results);
+      console.log(datas);
 
       fetch(url, {
         method: "POST",
@@ -194,19 +195,24 @@ export default defineComponent({
       this.selectedStudent = this.datas.find((d: any) => d.seat === val);
       this.isOpenModalTp = true;
     },
-    selectTp(val: number) {
+    selectTp(val: string) {
       let tempExp = 0;
       if (this.selectedStudent.tp !== 0) {
         tempExp = this.tpExps[this.selectedStudent.tp - 1];
       }
       // remove all tp
-      if (val === 0) {
+      const aveTp =
+        Math.round(JSON.parse(val).reduce((a: number, b: number) => a + b, 0) /
+        JSON.parse(val).length);
+
+      if (aveTp === 0) {
         this.selectedStudent.exp -= tempExp;
         this.selectedStudent.tp = 0;
         return;
       }
-      this.selectedStudent.exp += this.tpExps[val - 1] - tempExp;
-      this.selectedStudent.tp = val;
+      this.selectedStudent.exp += this.tpExps[aveTp - 1] - tempExp;
+      this.selectedStudent.tp = aveTp;
+      this.selectedStudent.tpStr = val;
     },
     singleExp(value: any) {
       this.datas.find((d: any) => d.seat === value.seat).exp += value.val;

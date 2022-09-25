@@ -3,46 +3,83 @@
     <div v-show="open" class="modalTp">
       <div class="overlay"></div>
       <div class="content">
-        <span>TP: </span>
-        <button @click="selectTp(0)" class="btn large">0</button>
-        <button
-          v-for="n in 6"
-          :key="n"
-          @click="selectTp(n)"
-          class="btn large"
-        >
-          <img
-            v-for="m in n"
-            :key="m"
-            src="../assets/images/star.png"
-            width="12"
-          />
-        </button>
-        <button @click="close" class="btn large">x</button>
+        <div class="singleTp" v-for="(tp, index) in tps" :key="tp">
+          <span>{{ index + 1 }}.</span>
+          <button @click="selectTp(index, 0)" class="btn large">0</button>
+          <button
+            v-for="n in 6"
+            :key="n"
+            @click="selectTp(index, n)"
+            :class="{ active: tps[index] === n }"
+            class="btn large"
+          >
+            <img
+              v-for="m in n"
+              :key="m"
+              src="../assets/images/star.png"
+              width="12"
+            />
+          </button>
+        </div>
+        <div class="bottom">
+          <button @click="updateTp" class="btn">Update</button>
+          <button @click="close" class="btn">Close</button>
+        </div>
       </div>
     </div>
   </transition>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "ModalTp",
-  props: ["open"],
+  props: ["open", "evaluateCount", "selectedStudent"],
   emits: ["close", "selectTp"],
-  data() {
+  setup(props) {
+    const tps = ref<number[]>([]);
+    for (let i = 0; i < props.evaluateCount; i++) {
+      tps.value.push(0);
+    }
+    return { tps };
+  },
+  data(){
     return {
-      selectedStudent: null,
-    };
+      tps: [] as number[]
+    }
   },
   methods: {
     close() {
       this.$emit("close");
     },
-    selectTp(val: number) {
-      this.$emit("selectTp", val);
+    selectTp(index: number, val: number) {
+      this.tps[index] = val;
+    },
+    updateTp() {
+      this.$emit("selectTp", JSON.stringify(this.tps));
       this.$emit("close");
+    },
+  },
+  watch: {
+    open(newVal) {
+      if (newVal === true) {
+        const parse = JSON.parse(this.selectedStudent.tpStr);
+        const totalTp = parse.reduce(
+          (v: number, t: number) => (t = t + v),
+          0
+        );
+
+        if (totalTp === 0) {
+          const arr = [];
+          for (let i = 0; i < this.evaluateCount; i++) {
+            arr.push(0);
+          }
+          this.tps = arr;
+        } else {
+          this.tps = parse;
+        }
+      }
     },
   },
 });
@@ -74,11 +111,26 @@ export default defineComponent({
     position: relative;
     padding: 20px;
     background-color: black;
+    display: flex;
+    flex-direction: column;
+    .singleTp {
+      display: flex;
+      align-items: center;
+      & ~ .singleTp {
+        margin-top: 8px;
+      }
+    }
     .large {
       height: 56px;
       width: 48px;
       margin-left: 10px;
     }
+    .active {
+      border: 2px solid white;
+    }
+  }
+  .bottom {
+    margin-top: 20px;
   }
 }
 
