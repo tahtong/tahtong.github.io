@@ -35,6 +35,9 @@
     <button v-show="teacherMode" @click="allExp(-1)" class="btn primary minus">
       -1 Exp
     </button>
+    <button @click="isShowNumber = !isShowNumber" class="btn primary">
+      {{ isShowNumber ? "Hide" : "Show" }} no.
+    </button>
     <button
       v-show="teacherMode"
       @click="updateResult(datas)"
@@ -52,6 +55,7 @@
       :key="data.seat"
       :data="data"
       :teacher-mode="teacherMode"
+      :isShowNumber="isShowNumber"
       @tp="openModalTp"
       @exp="singleExp"
       @absent="absent"
@@ -76,10 +80,18 @@
     @skills="skills"
     @close="isOpenModalRadar = false"
   />
+
+  <!-- keyboard -->
+  <div v-show="isOpenKeyboard && teacherMode" class="keyboard">
+    <p class="saved">{{ keyboard }}</p>
+    <p v-show="selectedStudent" class="selectedStudentName">
+      {{ selectedStudent.name }}
+    </p>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import Seat from "./Seat.vue";
 import ModalTp from "./ModalTp.vue";
 import ModalRadar from "./ModalRadar.vue";
@@ -95,7 +107,7 @@ export default defineComponent({
   data() {
     return {
       password: "",
-      teacherMode: false,
+      teacherMode: true, // flase
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -105,8 +117,12 @@ export default defineComponent({
       isShowResult: false,
       labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "反思"],
       selectedTp: 4,
-      evaluateCount: 2,
+      evaluateCount: 1,
       isLoading: false,
+      isOpenKeyboard: false,
+      keyboard: "",
+      keyboardOperator: "",
+      isShowNumber: false,
     };
   },
   setup(props) {
@@ -255,6 +271,52 @@ export default defineComponent({
         this.teacherMode = true;
       }
     },
+    onKeyboard(e: KeyboardEvent) {
+      this.isOpenKeyboard = true;
+      this.keyboard += e.key;
+      // this.keyboard.length === 2
+      if (this.keyboard.length === 2) {
+        this.selectedStudent = this.datas.find(
+          (d: any) => d.no === parseInt(this.keyboard)
+        );
+      }
+      // this.keyboard.length === 3
+      if (this.keyboard.length === 3) {
+        const operation = this.keyboard.substring(2, 3);
+        if (operation === "+" || operation === "-") {
+          this.keyboardOperator = operation;
+        } else if (operation === "*") {
+          if (this.evaluateCount === 1) {
+            this.keyboardOperator = operation;
+          } else {
+            alert("Not allow to use! (evaluateCount must 1)");
+            this.isOpenKeyboard = false;
+            this.keyboard = "";
+          }
+        }
+      }
+      // this.keyboard.length === 4
+      if (this.keyboard.length === 4) {
+        const value = parseInt(this.keyboard.substring(3, 4));
+        if (this.keyboardOperator === "+") {
+          this.selectedStudent.exp += value;
+        } else if (this.keyboardOperator === "-") {
+          this.selectedStudent.exp -= value;
+        } else if (this.keyboardOperator === "*") {
+          this.selectTp(`[${value}]`);
+        }
+        this.isOpenKeyboard = false;
+        this.keyboard = "";
+      }
+
+      if (e.key === ".") {
+        this.isOpenKeyboard = false;
+        this.keyboard = "";
+      }
+    },
+  },
+  created() {
+    window.addEventListener("keypress", this.onKeyboard);
   },
 });
 </script>
@@ -274,6 +336,26 @@ export default defineComponent({
   grid-auto-flow: row dense;
   @media (max-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.keyboard {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-size: 60px;
+  padding-bottom: 10%;
+  .saved {
+    font-size: 100px;
   }
 }
 </style>

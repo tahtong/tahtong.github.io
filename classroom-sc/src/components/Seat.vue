@@ -21,6 +21,7 @@
         <div v-if="data.s5 > 0" class="skill s5">{{ data.s5 }}</div>
         <div v-if="data.s6 > 0" class="skill s6">{{ data.s6 }}</div>
       </div>
+      <div v-show="isShowNumber" class="no">{{ data.no }}</div>
     </div>
     <div class="chair">
       <div class="expBar">
@@ -47,7 +48,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Seat",
-  props: ["data", "teacherMode"],
+  props: ["data", "teacherMode", "isShowNumber"],
   emits: ["tp", "exp", "absent", "skill"],
   data() {
     return {
@@ -173,7 +174,6 @@ export default defineComponent({
       }
     }
   }
-
   .skills {
     display: flex;
     flex-direction: column;
@@ -206,6 +206,19 @@ export default defineComponent({
         background-color: #205765;
       }
     }
+  }
+
+  .no {
+    position: absolute;
+    right: 2px;
+    font-family: monospace;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid white;
+    display: grid;
+    place-content: center;
+    background-color: #111111;
   }
 }
 .chair {
