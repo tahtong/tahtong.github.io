@@ -1,7 +1,10 @@
 <template>
   <div :class="{ absent: data.absent }" class="seat">
     <div @click="skill(data.seat)" class="table">
-      <div :class="'avatart-' + data.avatar" class="avatar"></div>
+      <div
+        :class="'avatart-' + getLevelAndExp(data.exp).level"
+        class="avatar"
+      ></div>
       <div class="content">
         <div class="name">{{ data.name }}</div>
         <div class="level">LV {{ getLevelAndExp(data.exp).level }}</div>
@@ -9,6 +12,14 @@
       </div>
       <div class="tp">
         <img v-for="n in data.tp" :key="n" src="../assets/images/star.png" />
+      </div>
+      <div class="skills">
+        <div v-if="data.s1 > 0" class="skill s1">{{ data.s1 }}</div>
+        <div v-if="data.s2 > 0" class="skill s2">{{ data.s2 }}</div>
+        <div v-if="data.s3 > 0" class="skill s3">{{ data.s3 }}</div>
+        <div v-if="data.s4 > 0" class="skill s4">{{ data.s4 }}</div>
+        <div v-if="data.s5 > 0" class="skill s5">{{ data.s5 }}</div>
+        <div v-if="data.s6 > 0" class="skill s6">{{ data.s6 }}</div>
       </div>
     </div>
     <div class="chair">
@@ -109,12 +120,15 @@ export default defineComponent({
   display: flex;
   margin: 5px 0;
   cursor: pointer;
+  position: relative;
   .avatar {
     background-image: url(../assets/images/heros.png);
     height: 50px;
     width: 50px;
     flex: 0 0 50px;
     background-size: 300px;
+    position: relative;
+    z-index: 1;
     @for $i from 23 through 0 {
       &.avatart-#{$i + 1} {
         background-position: #{floor($i / 4) * -100%} #{($i % 4) * -100%};
@@ -153,9 +167,43 @@ export default defineComponent({
       height: 14px;
       &:nth-last-child(1),
       &:nth-last-child(2),
-      &:nth-last-child(3){
-        width:10px;
-        height:10px;
+      &:nth-last-child(3) {
+        width: 10px;
+        height: 10px;
+      }
+    }
+  }
+
+  .skills {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    .skill {
+      width: 10px;
+      height: 10px;
+      font-size: 7px;
+      display: grid;
+      place-items: center;
+      &.s1 {
+        background-color: #5b1647;
+      }
+      &.s2 {
+        background-color: #93073e;
+      }
+      &.s3 {
+        background-color: #c90035;
+      }
+      &.s4 {
+        background-color: #ff5627;
+      }
+      &.s5 {
+        background-color: #ffc400;
+        color: black;
+      }
+      &.s6 {
+        background-color: #205765;
       }
     }
   }

@@ -8,7 +8,7 @@
           selectedClassroom = n;
           inputPassword.focus();
         "
-        class="btn primary"
+        class="btn primary main"
       >
         {{ n }}
       </button>
@@ -31,8 +31,12 @@
       </button>
     </section>
     <br />
-    <br />
     <p v-if="isPasswordWrong">Wrong Password!</p>
+    <br />
+    <section v-show="selectedClassroom === '5H'">
+      <p>Powered by: 古老师</p>
+      <p>Contact: 016-728 1563</p>
+    </section>
   </div>
   <Classroom
     v-else
@@ -201,5 +205,10 @@ input {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.btn.main{
+  height: 50px;
+  width:100px;
+  font-size: 20px;
 }
 </style>

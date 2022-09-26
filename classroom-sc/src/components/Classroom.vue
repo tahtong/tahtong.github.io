@@ -40,7 +40,8 @@
       @click="updateResult(datas)"
       class="btn primary"
     >
-      Update
+      <span v-if="isLoading">Loading...</span>
+      <span v-else>Update</span>
     </button>
   </div>
 
@@ -102,9 +103,10 @@ export default defineComponent({
       isOpenModalRadar: false,
       selectedSkills: [0, 0, 0, 0, 0, 0],
       isShowResult: false,
-      labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "德行"],
+      labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "反思"],
       selectedTp: 4,
       evaluateCount: 2,
+      isLoading: false,
     };
   },
   setup(props) {
@@ -157,6 +159,8 @@ export default defineComponent({
 
       console.log(datas);
 
+      this.isLoading = true;
+
       fetch(url, {
         method: "POST",
         mode: "no-cors",
@@ -166,7 +170,7 @@ export default defineComponent({
         },
         redirect: "follow",
         body: JSON.stringify({ data: results }),
-      }).then(() => alert("Response"));
+      }).then(() => (this.isLoading = false));
     },
     allTp(val: number) {
       this.datas.forEach((d: any) => {
@@ -201,9 +205,10 @@ export default defineComponent({
         tempExp = this.tpExps[this.selectedStudent.tp - 1];
       }
       // remove all tp
-      const aveTp =
-        Math.round(JSON.parse(val).reduce((a: number, b: number) => a + b, 0) /
-        JSON.parse(val).length);
+      const aveTp = Math.round(
+        JSON.parse(val).reduce((a: number, b: number) => a + b, 0) /
+          JSON.parse(val).length
+      );
 
       if (aveTp === 0) {
         this.selectedStudent.exp -= tempExp;

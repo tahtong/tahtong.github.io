@@ -46,6 +46,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .modal {
   position: fixed;
+  z-index:2;
   width: 100%;
   height: 100%;
   top: 0;
