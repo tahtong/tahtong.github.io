@@ -107,7 +107,7 @@ export default defineComponent({
   data() {
     return {
       password: "",
-      teacherMode: true, // flase
+      teacherMode: false, 
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -272,6 +272,9 @@ export default defineComponent({
       }
     },
     onKeyboard(e: KeyboardEvent) {
+      if(!this.teacherMode){
+        return;
+      }
       this.isOpenKeyboard = true;
       this.keyboard += e.key;
       // this.keyboard.length === 2
