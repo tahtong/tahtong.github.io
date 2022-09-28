@@ -46,6 +46,10 @@
       <span v-if="isLoading">Loading...</span>
       <span v-else>Update</span>
     </button>
+
+    <button @click="sortBy()" class="btn primary">
+      Sort by: {{ sortType }}
+    </button>
   </div>
 
   <!-- seat -->
@@ -96,6 +100,13 @@ import Seat from "./Seat.vue";
 import ModalTp from "./ModalTp.vue";
 import ModalRadar from "./ModalRadar.vue";
 
+function aveTpFn(val: string) {
+  return Math.round(
+    JSON.parse(val).reduce((a: number, b: number) => a + b, 0) /
+      JSON.parse(val).length
+  );
+}
+
 export default defineComponent({
   name: "Classroom",
   props: ["sheetUrl", "scriptUrl"],
@@ -107,7 +118,7 @@ export default defineComponent({
   data() {
     return {
       password: "",
-      teacherMode: false, 
+      teacherMode: false,
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -123,6 +134,7 @@ export default defineComponent({
       keyboard: "",
       keyboardOperator: "",
       isShowNumber: false,
+      sortType: "",
     };
   },
   setup(props) {
@@ -138,10 +150,10 @@ export default defineComponent({
         row.c.forEach((data: any, index: number) => {
           obj[cols[index].label] = data.v;
         });
-        obj.tp = 0;
+        obj.tp = aveTpFn(obj.tpStr);
         return obj;
       });
-      results.sort((a: any, b: any) => a.seat - b.seat);
+      results.sort((a: any, b: any) => a.seat < b.seat);
       return results;
     }
 
@@ -221,10 +233,7 @@ export default defineComponent({
         tempExp = this.tpExps[this.selectedStudent.tp - 1];
       }
       // remove all tp
-      const aveTp = Math.round(
-        JSON.parse(val).reduce((a: number, b: number) => a + b, 0) /
-          JSON.parse(val).length
-      );
+      const aveTp = aveTpFn(val);
 
       if (aveTp === 0) {
         this.selectedStudent.exp -= tempExp;
@@ -272,7 +281,7 @@ export default defineComponent({
       }
     },
     onKeyboard(e: KeyboardEvent) {
-      if(!this.teacherMode){
+      if (!this.teacherMode) {
         return;
       }
       this.isOpenKeyboard = true;
@@ -315,6 +324,18 @@ export default defineComponent({
       if (e.key === ".") {
         this.isOpenKeyboard = false;
         this.keyboard = "";
+      }
+    },
+    sortBy() {
+      if (this.sortType === "") {
+        this.sortType = "High to Low";
+        this.datas.sort((a: any, b: any) => a.exp - b.exp).reverse();
+      } else if (this.sortType === "High to Low") {
+        this.sortType = "Low to High";
+        this.datas.sort((a: any, b: any) => a.exp - b.exp);
+      } else if (this.sortType === "Low to High") {
+        this.sortType = "";
+        this.datas.sort((a: any, b: any) => a.no - b.no);
       }
     },
   },
