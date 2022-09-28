@@ -291,6 +291,10 @@ export default defineComponent({
         this.selectedStudent = this.datas.find(
           (d: any) => d.no === parseInt(this.keyboard)
         );
+
+        if (parseInt(this.keyboard) < 10) {
+          this.keyboard = "0" + parseInt(this.keyboard);
+        }
       }
       // this.keyboard.length === 3
       if (this.keyboard.length === 3) {
