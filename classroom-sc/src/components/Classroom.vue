@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div v-show="teacherMode" style="margin-right: 10px">
+    <div v-show="teacherMode && isDefaultEvalute" style="margin-right: 10px">
       <span>Evaluate </span>
       <input v-model="evaluateCount" type="number" min="1" />
     </div>
@@ -35,7 +35,7 @@
     <button v-show="teacherMode" @click="allExp(-1)" class="btn primary minus">
       -1 Exp
     </button>
-    <button @click="isShowNumber = !isShowNumber" class="btn primary">
+    <button v-show="teacherMode" @click="isShowNumber = !isShowNumber" class="btn primary">
       {{ isShowNumber ? "Hide" : "Show" }} no.
     </button>
     <button
@@ -47,8 +47,15 @@
       <span v-else>Update</span>
     </button>
 
-    <button @click="sortBy()" class="btn primary">
+    <button v-show="teacherMode" @click="sortBy()" class="btn primary">
       Sort by: {{ sortType }}
+    </button>
+    <button v-show="teacherMode" @click="isShowTp = !isShowTp" class="btn primary">
+      {{ isShowTp ? 'Hide' : 'Show'}} TP
+    </button>
+    
+    <button v-show="teacherMode" @click="teacherMode = false" class="btn primary">
+      x
     </button>
   </div>
 
@@ -60,6 +67,7 @@
       :data="data"
       :teacher-mode="teacherMode"
       :isShowNumber="isShowNumber"
+      :isShowTp="isShowTp"
       @tp="openModalTp"
       @exp="singleExp"
       @absent="absent"
@@ -135,12 +143,14 @@ export default defineComponent({
       keyboardOperator: "",
       isShowNumber: false,
       sortType: "",
+      isShowTp:false
     };
   },
   setup(props) {
     const inputPassword = ref();
     let datas = ref([]);
     const url = `https://docs.google.com/spreadsheets/d/${props.sheetUrl}/gviz/tq?tqx=out:json`;
+    let isDefaultEvalute = ref(false);
 
     function jsonToObject(rep: any) {
       const data = JSON.parse(rep.substring(47).slice(0, -2));
@@ -159,9 +169,19 @@ export default defineComponent({
 
     fetch(url + "&sheet=Sheet1")
       .then((res) => res.text())
-      .then((rep) => (datas.value = jsonToObject(rep)));
+      .then((rep) => {
+        datas.value = jsonToObject(rep);
+        isDefaultEvalute.value = datas.value.every(
+          (d: any) => d.tpStr === "[0]"
+        );
+      });
 
-    return { inputPassword, datas, scriptUrl: props.scriptUrl };
+    return {
+      inputPassword,
+      datas,
+      scriptUrl: props.scriptUrl,
+      isDefaultEvalute,
+    };
   },
   mounted() {
     this.inputPassword.focus();
@@ -243,6 +263,11 @@ export default defineComponent({
       this.selectedStudent.exp += this.tpExps[aveTp - 1] - tempExp;
       this.selectedStudent.tp = aveTp;
       this.selectedStudent.tpStr = val;
+
+      const sum = JSON.parse(this.selectedStudent.tpStr).reduce((v:number, t:number)=> t += v, 0)
+      if(sum !== 0){
+        this.isDefaultEvalute = false;
+      }
     },
     singleExp(value: any) {
       this.datas.find((d: any) => d.seat === value.seat).exp += value.val;
@@ -340,6 +365,28 @@ export default defineComponent({
       } else if (this.sortType === "Low to High") {
         this.sortType = "";
         this.datas.sort((a: any, b: any) => a.no - b.no);
+      }
+    },
+  },
+  watch: {
+    evaluateCount(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        const allZero = this.datas.every((d: any) => {
+          const sum = JSON.parse(d.tpStr).reduce(
+            (v: number, t: number) => (t += v),
+            0
+          );
+          return sum === 0;
+        });
+
+        if (allZero) {
+          const arr = [];
+          for (let i = 0; i < newVal; i++) {
+            arr.push(0);
+          }
+          const JSONTpStr = JSON.stringify(arr);
+          this.datas.forEach((d: any) => d.tpStr = JSONTpStr);
+        }
       }
     },
   },

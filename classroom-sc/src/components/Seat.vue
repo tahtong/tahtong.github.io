@@ -9,6 +9,7 @@
         <div class="name">{{ data.name }}</div>
         <div class="level">LV {{ getLevelAndExp(data.exp).level }}</div>
         <div class="exp">Exp: {{ data.exp }}</div>
+        <pre v-show="isShowTp">{{ data.tpStr }}</pre>
       </div>
       <div class="tp">
         <img v-for="n in data.tp" :key="n" src="../assets/images/star.png" />
@@ -48,7 +49,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Seat",
-  props: ["data", "teacherMode", "isShowNumber"],
+  props: ["data", "teacherMode", "isShowNumber","isShowTp"],
   emits: ["tp", "exp", "absent", "skill"],
   data() {
     return {
