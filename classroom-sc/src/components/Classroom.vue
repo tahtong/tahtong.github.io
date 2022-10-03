@@ -1,78 +1,62 @@
 <template>
+  <pre>{{ selectedGroup }}</pre>
   <div class="header">
-    <div v-show="teacherMode && isDefaultEvalute" style="margin-right: 10px">
-      <span>Evaluate </span>
-      <input v-model="evaluateCount" type="number" min="1" />
-    </div>
-    <div v-show="teacherMode" style="margin-right: 10px">
-      <span>TP </span>
-      <input v-model="selectedTp" type="number" max="6" min="0" />
-    </div>
-    <input
-      ref="inputPassword"
-      v-show="!teacherMode"
-      v-model="password"
-      type="password"
-    />
-    <button
-      v-show="!teacherMode"
-      @click="checkPassword(password)"
-      class="btn primary"
-    >
-      Run
-    </button>
-
-    <button
-      v-show="teacherMode"
-      @click="allTp(selectedTp)"
-      class="btn primary plus"
-    >
-      {{ selectedTp }} Tp
-    </button>
-    <button v-show="teacherMode" @click="allExp(1)" class="btn primary plus">
-      +1 Exp
-    </button>
-    <button v-show="teacherMode" @click="allExp(-1)" class="btn primary minus">
-      -1 Exp
-    </button>
-    <button
-      v-show="teacherMode"
-      @click="isShowNumber = !isShowNumber"
-      class="btn primary"
-    >
-      {{ isShowNumber ? "Hide" : "Show" }} no.
-    </button>
-    <button
-      v-show="teacherMode"
-      @click="updateResult(datas)"
-      class="btn primary"
-    >
-      <span v-if="isLoading">Loading...</span>
-      <span v-else>Update</span>
-    </button>
-
-    <button v-show="teacherMode" @click="sortBy()" class="btn primary">
-      Sort by: {{ sortType }}
-    </button>
-    <button
-      v-show="teacherMode"
-      @click="isShowTp = !isShowTp"
-      class="btn primary"
-    >
-      {{ isShowTp ? "Hide" : "Show" }} TP
-    </button>
-
-    <button
-      v-show="teacherMode"
-      @click="teacherMode = false"
-      class="btn primary"
-    >
-      x
-    </button>
+    <!-- teacherMode = false -->
+    <section v-show="!teacherMode">
+      <input ref="inputPassword" v-model="password" type="password" />
+      <button @click="checkPassword(password)" class="btn primary">Run</button>
+    </section>
+    <!-- teacherMode = true -->
+    <section v-show="teacherMode">
+      <div v-show="isDefaultEvalute">
+        <span>Evaluate </span>
+        <input v-model="evaluateCount" type="number" min="1" />
+      </div>
+      <div>
+        <span>TP </span>
+        <input v-model="selectedTp" type="number" max="6" min="0" />
+      </div>
+      <button @click="allTp(selectedTp)" class="btn primary plus">
+        {{ selectedTp }} Tp
+      </button>
+      <button @click="allExp(1)" class="btn primary plus">+1 Exp</button>
+      <button @click="allExp(-1)" class="btn primary minus">-1 Exp</button>
+      <button @click="updateResult(datas)" class="btn primary">
+        <span v-if="isLoading">Loading...</span>
+        <span v-else>Update</span>
+      </button>
+      <button @click="teacherMode = false" class="btn primary">x</button>
+      <button @click="showOption = !showOption" class="btn primary">
+        {{ showOption ? "Hide" : "Show" }} more
+      </button>
+    </section>
+    <!-- showOption = true -->
+    <section v-show="showOption">
+      <div>Group <input v-model="groupTotal" type="number" /></div>
+      <button @click="grouping" class="btn primary">
+        {{ groupTotal }} Group
+      </button>
+      <button @click="isShowGrouping = false" class="btn primary">
+        x Group
+      </button>
+      <button @click="isShowNumber = !isShowNumber" class="btn primary">
+        {{ isShowNumber ? "Hide" : "Show" }} no.
+      </button>
+      <button @click="isShowTp = !isShowTp" class="btn primary">
+        {{ isShowTp ? "Hide" : "Show" }} TP
+      </button>
+      <button @click="sortBy()" class="btn primary">
+        Sort by: {{ sortType }}
+      </button>
+    </section>
   </div>
 
   <!-- seat -->
-  <div class="seats">
+  <div
+    :class="{ group: isShowGrouping }"
+    :style="'grid-template-columns : repeat(' + groupTotal + ', 1fr)'"
+    class="seats"
+  >
     <Seat
       v-for="data in datas"
       :key="data.seat"
@@ -80,11 +64,30 @@
       :teacher-mode="teacherMode"
       :isShowNumber="isShowNumber"
       :isShowTp="isShowTp"
-      @tp="openModalTp"
+      :isShowGrouping="isShowGrouping"
+      @tp="openModalTpForStudent"
       @exp="singleExp"
       @absent="absent"
       @skill="openModalSkill"
     />
+  </div>
+  <div class="grouping">
+    <div
+      @click="openModalTpForGroup(index)"
+      v-for="(group, index) in groups"
+      :key="index"
+      class="group"
+    >
+      <div class="top">
+        <p class="title">{{ indexToAlphabet(index) }}</p>
+        <div class="name">
+          <span v-for="student in group.students" :key="student">{{
+            student.name
+          }}</span>
+        </div>
+      </div>
+      <pre>{{ group.tps }}</pre>
+    </div>
   </div>
 
   <!-- ModalTp -->
@@ -92,7 +95,11 @@
     :open="isOpenModalTp"
     :evaluateCount="evaluateCount"
     :selectedStudent="selectedStudent"
-    @close="isOpenModalTp = false"
+    :selectedGroup="selectedGroup"
+    @close="
+      isOpenModalTp = false;
+      (selectedStudent = {}), (selectedGroup = {});
+    "
     @selectTp="selectTp"
   />
 
@@ -104,6 +111,14 @@
     @skills="skills"
     @close="isOpenModalRadar = false"
   />
+
+  <!-- Grouping
+  <ModalGroup
+    :open="isShowGrouping"
+    :students="datas"
+    @close="isShowGrouping = false"
+    @updateGroupTotal="updateGroupTotal"
+  /> -->
 
   <!-- keyboard -->
   <div v-show="isOpenKeyboard && teacherMode" class="keyboard">
@@ -133,12 +148,12 @@ export default defineComponent({
   components: {
     Seat,
     ModalTp,
-    ModalRadar,
+    ModalRadar
   },
   data() {
     return {
       password: "",
-      teacherMode: false,
+      teacherMode: true, //
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -156,6 +171,11 @@ export default defineComponent({
       isShowNumber: false,
       sortType: "",
       isShowTp: false,
+      isShowGrouping: true, //
+      groupTotal: 5,
+      showOption: true, //
+      groups: [] as any,
+      selectedGroup: {} as any,
     };
   },
   setup(props) {
@@ -255,7 +275,7 @@ export default defineComponent({
         }
       });
     },
-    openModalTp(val: number) {
+    openModalTpForStudent(val: number) {
       this.selectedStudent = this.datas.find((d: any) => d.seat === val);
       this.isOpenModalTp = true;
     },
@@ -326,7 +346,7 @@ export default defineComponent({
       }
       this.isOpenKeyboard = true;
       this.keyboard += e.key;
-      
+
       // this.keyboard.length === 2
       if (this.keyboard.length === 2) {
         this.selectedStudent = this.datas.find(
@@ -383,6 +403,33 @@ export default defineComponent({
         this.datas.sort((a: any, b: any) => a.no - b.no);
       }
     },
+    grouping() {
+      this.isShowGrouping = true;
+      this.groups = [];
+
+      for (let i = 0; i < this.groupTotal; i++) {
+        this.groups.push({
+          students: [],
+          tps: [0],
+          name: this.indexToAlphabet(i)
+        });
+      }
+
+      for (let i = 0; i < this.datas.length; i++) {
+        const groupIndex = Math.floor(
+          i / Math.ceil(this.datas.length / this.groupTotal)
+        );
+        this.groups[groupIndex].students.push(this.datas[i]);
+      }
+    },
+    indexToAlphabet(val: number) {
+      const alphabets = ["A", "B", "C", "D", "E", "F", "G", "H"];
+      return alphabets[val];
+    },
+    openModalTpForGroup(val: number) {
+      this.selectedGroup = this.groups[val];
+      this.isOpenModalTp = true;
+    },
   },
   watch: {
     evaluateCount(newVal, oldVal) {
@@ -414,9 +461,12 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .header {
-  display: flex;
-  button ~ button {
-    margin-left: 5px;
+  section {
+    display: flex;
+    margin-top: 5px;
+    & > * {
+      margin-left: 5px;
+    }
   }
 }
 .seats {
@@ -427,9 +477,45 @@ export default defineComponent({
   @media (max-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
   }
-  // grid-auto-flow: column;
-  // grid-template-rows: repeat(6, 1fr);
-  // grid-template-columns: none;
+  &.group {
+    width: 50%;
+    grid-gap: 2px;
+    float: left;
+  }
+}
+.grouping {
+  margin-top: 10px;
+  width: 50%;
+  float: left;
+  padding: 10px;
+  .group {
+    border: 1px solid white;
+    padding: 10px;
+    &:hover {
+      border: 3px solid white;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+
+      .title {
+        margin-right: 8px;
+        font-size: 18px;
+        padding: 5px;
+        font-weight: 700;
+        background-color: white;
+        color: #222222;
+        display: grid;
+        place-content: center;
+      }
+      .name {
+        span {
+          margin-right: 5px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
 }
 
 .keyboard {

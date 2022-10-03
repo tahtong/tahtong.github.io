@@ -3,6 +3,7 @@
     <div v-show="open" class="modalTp">
       <div class="overlay"></div>
       <div class="content">
+        <h3>{{ title }}</h3>
         <div class="singleTp" v-for="(tp, index) in tps" :key="tp">
           <span>{{ index + 1 }}.</span>
           <button @click="selectTp(index, 0)" class="btn large">0</button>
@@ -35,7 +36,7 @@ import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "ModalTp",
-  props: ["open", "evaluateCount", "selectedStudent"],
+  props: ["open", "evaluateCount", "selectedStudent","selectedGroup"],
   emits: ["close", "selectTp"],
   setup(props) {
     const tps = ref<number[]>([]);
@@ -44,10 +45,11 @@ export default defineComponent({
     }
     return { tps };
   },
-  data(){
+  data() {
     return {
-      tps: [] as number[]
-    }
+      tps: [] as number[],
+      title: ""
+    };
   },
   methods: {
     close() {
@@ -64,20 +66,36 @@ export default defineComponent({
   watch: {
     open(newVal) {
       if (newVal === true) {
-        const parse = JSON.parse(this.selectedStudent.tpStr);
-        const totalTp = parse.reduce(
-          (v: number, t: number) => (t = t + v),
-          0
-        );
+        // single student
+        if (
+          this.selectedStudent &&
+          Object.keys(this.selectedStudent).length > 0
+        ) {
+          this.title = this.selectedStudent.name;
+          const parse = JSON.parse(this.selectedStudent.tpStr);
+          const totalTp = parse.reduce(
+            (v: number, t: number) => (t = t + v),
+            0
+          );
 
-        if (totalTp === 0) {
-          const arr = [];
-          for (let i = 0; i < this.evaluateCount; i++) {
-            arr.push(0);
+          if (totalTp === 0) {
+            const arr = [];
+            for (let i = 0; i < this.evaluateCount; i++) {
+              arr.push(0);
+            }
+            this.tps = arr;
+          } else {
+            this.tps = parse;
           }
-          this.tps = arr;
-        } else {
-          this.tps = parse;
+        }
+        
+        console.log(this.selectedGroup)
+        // group students
+        if (
+          this.selectedGroup &&
+          Object.keys(this.selectedGroup).length > 0
+        ) {
+          this.title = `${this.selectedGroup.name}组`;
         }
       }
     },
@@ -88,7 +106,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .modalTp {
   position: fixed;
-  z-index:2;
+  z-index: 2;
   width: 100%;
   height: 100%;
   top: 0;
@@ -114,6 +132,10 @@ export default defineComponent({
     background-color: black;
     display: flex;
     flex-direction: column;
+
+    h3{
+      margin-bottom:10px;
+    }
     .singleTp {
       display: flex;
       align-items: center;

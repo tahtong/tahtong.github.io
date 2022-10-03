@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ absent: data.absent }" class="seat">
+  <div :class="{ absent: data.absent, group: isShowGrouping }" class="seat">
     <div @click="skill(data.seat)" class="table">
       <div
         :class="'avatart-' + getLevelAndExp(data.exp).level"
@@ -49,7 +49,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Seat",
-  props: ["data", "teacherMode", "isShowNumber","isShowTp"],
+  props: ["data", "teacherMode", "isShowNumber", "isShowTp", "isShowGrouping"],
   emits: ["tp", "exp", "absent", "skill"],
   data() {
     return {
@@ -114,6 +114,17 @@ export default defineComponent({
       &:nth-child(2),
       &:nth-child(3) {
         pointer-events: none;
+      }
+    }
+  }
+  &.group {
+    font-size: 10px;
+    .content {
+      display: none;
+    }
+    .chair {
+      button {
+        display: none;
       }
     }
   }

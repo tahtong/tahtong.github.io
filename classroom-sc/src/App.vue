@@ -57,8 +57,10 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedClassroom: "",
-      accessAble: false,
+      selectedClassroom: "5H", //
+      selectedSheetUrl: "1h7I_XLNA4NnL91nUENt9N2tw3-xrqgxHVXm3dCaVlE4", //
+      selectedScriptUrl: "AKfycbxtsO4E6XdEaYqiLwr35s8G4GWw9b_9xLkTVh3AEwhtayf9N-kZFWYqLt8SLvH9cpFe", //
+      accessAble: true,
       password: "",
       isPasswordWrong: false,
       sheetUrls: [
@@ -99,8 +101,6 @@ export default defineComponent({
             "AKfycbx5PCY_SgDwXyO8r9cnWUCrdMSqRaNbsb-A3VlcvXyRwlruetniiQeG51x1ygSPbgDQ",
         },
       ],
-      selectedSheetUrl: "",
-      selectedScriptUrl: "",
     };
   },
   components: {
