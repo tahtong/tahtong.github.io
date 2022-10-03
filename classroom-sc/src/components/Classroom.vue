@@ -35,7 +35,11 @@
     <button v-show="teacherMode" @click="allExp(-1)" class="btn primary minus">
       -1 Exp
     </button>
-    <button v-show="teacherMode" @click="isShowNumber = !isShowNumber" class="btn primary">
+    <button
+      v-show="teacherMode"
+      @click="isShowNumber = !isShowNumber"
+      class="btn primary"
+    >
       {{ isShowNumber ? "Hide" : "Show" }} no.
     </button>
     <button
@@ -50,11 +54,19 @@
     <button v-show="teacherMode" @click="sortBy()" class="btn primary">
       Sort by: {{ sortType }}
     </button>
-    <button v-show="teacherMode" @click="isShowTp = !isShowTp" class="btn primary">
-      {{ isShowTp ? 'Hide' : 'Show'}} TP
+    <button
+      v-show="teacherMode"
+      @click="isShowTp = !isShowTp"
+      class="btn primary"
+    >
+      {{ isShowTp ? "Hide" : "Show" }} TP
     </button>
-    
-    <button v-show="teacherMode" @click="teacherMode = false" class="btn primary">
+
+    <button
+      v-show="teacherMode"
+      @click="teacherMode = false"
+      class="btn primary"
+    >
       x
     </button>
   </div>
@@ -143,7 +155,7 @@ export default defineComponent({
       keyboardOperator: "",
       isShowNumber: false,
       sortType: "",
-      isShowTp:false
+      isShowTp: false,
     };
   },
   setup(props) {
@@ -264,8 +276,11 @@ export default defineComponent({
       this.selectedStudent.tp = aveTp;
       this.selectedStudent.tpStr = val;
 
-      const sum = JSON.parse(this.selectedStudent.tpStr).reduce((v:number, t:number)=> t += v, 0)
-      if(sum !== 0){
+      const sum = JSON.parse(this.selectedStudent.tpStr).reduce(
+        (v: number, t: number) => (t += v),
+        0
+      );
+      if (sum !== 0) {
         this.isDefaultEvalute = false;
       }
     },
@@ -311,6 +326,7 @@ export default defineComponent({
       }
       this.isOpenKeyboard = true;
       this.keyboard += e.key;
+      
       // this.keyboard.length === 2
       if (this.keyboard.length === 2) {
         this.selectedStudent = this.datas.find(
@@ -385,7 +401,7 @@ export default defineComponent({
             arr.push(0);
           }
           const JSONTpStr = JSON.stringify(arr);
-          this.datas.forEach((d: any) => d.tpStr = JSONTpStr);
+          this.datas.forEach((d: any) => (d.tpStr = JSONTpStr));
         }
       }
     },
@@ -408,10 +424,12 @@ export default defineComponent({
   display: grid;
   grid-gap: 10px;
   grid-template-columns: repeat(5, 1fr);
-  grid-auto-flow: row dense;
   @media (max-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
   }
+  // grid-auto-flow: column;
+  // grid-template-rows: repeat(6, 1fr);
+  // grid-template-columns: none;
 }
 
 .keyboard {
