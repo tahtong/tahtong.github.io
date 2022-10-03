@@ -36,7 +36,7 @@ import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "ModalTp",
-  props: ["open", "evaluateCount", "selectedStudent","selectedGroup"],
+  props: ["open", "evaluateCount", "selectedStudent", "selectedGroup"],
   emits: ["close", "selectTp"],
   setup(props) {
     const tps = ref<number[]>([]);
@@ -48,7 +48,8 @@ export default defineComponent({
   data() {
     return {
       tps: [] as number[],
-      title: ""
+      type: "",
+      title: "",
     };
   },
   methods: {
@@ -59,43 +60,43 @@ export default defineComponent({
       this.tps[index] = val;
     },
     updateTp() {
-      this.$emit("selectTp", JSON.stringify(this.tps));
-      this.$emit("close");
+      this.$emit("selectTp", {
+        val: JSON.stringify(this.tps),
+        type: this.type,
+      });
     },
   },
   watch: {
     open(newVal) {
       if (newVal === true) {
-        // single student
+        let selected = {} as any;
         if (
           this.selectedStudent &&
           Object.keys(this.selectedStudent).length > 0
         ) {
+          selected = this.selectedStudent;
+          this.type = "student";
           this.title = this.selectedStudent.name;
-          const parse = JSON.parse(this.selectedStudent.tpStr);
-          const totalTp = parse.reduce(
-            (v: number, t: number) => (t = t + v),
-            0
-          );
-
-          if (totalTp === 0) {
-            const arr = [];
-            for (let i = 0; i < this.evaluateCount; i++) {
-              arr.push(0);
-            }
-            this.tps = arr;
-          } else {
-            this.tps = parse;
-          }
-        }
-        
-        console.log(this.selectedGroup)
-        // group students
-        if (
+        } else if (
           this.selectedGroup &&
           Object.keys(this.selectedGroup).length > 0
         ) {
+          selected = this.selectedGroup;
+          this.type = "group";
           this.title = `${this.selectedGroup.name}组`;
+        }
+
+        const parse = JSON.parse(selected.tpStr);
+        const totalTp = parse.reduce((v: number, t: number) => (t = t + v), 0);
+
+        if (totalTp === 0) {
+          const arr = [];
+          for (let i = 0; i < this.evaluateCount; i++) {
+            arr.push(0);
+          }
+          this.tps = arr;
+        } else {
+          this.tps = parse;
         }
       }
     },
@@ -133,8 +134,8 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
 
-    h3{
-      margin-bottom:10px;
+    h3 {
+      margin-bottom: 10px;
     }
     .singleTp {
       display: flex;

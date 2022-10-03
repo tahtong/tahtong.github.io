@@ -1,5 +1,4 @@
 <template>
-  <pre>{{ selectedGroup }}</pre>
   <div class="header">
     <!-- teacherMode = false -->
     <section v-show="!teacherMode">
@@ -21,6 +20,9 @@
       </button>
       <button @click="allExp(1)" class="btn primary plus">+1 Exp</button>
       <button @click="allExp(-1)" class="btn primary minus">-1 Exp</button>
+      <button @click="sortBy()" class="btn primary">
+        Sort by: {{ sortType }}
+      </button>
       <button @click="updateResult(datas)" class="btn primary">
         <span v-if="isLoading">Loading...</span>
         <span v-else>Update</span>
@@ -32,11 +34,17 @@
     </section>
     <!-- showOption = true -->
     <section v-show="showOption">
-      <div>Group <input v-model="groupTotal" type="number" /></div>
-      <button @click="grouping" class="btn primary">
-        {{ groupTotal }} Group
-      </button>
-      <button @click="isShowGrouping = false" class="btn primary">
+      <section v-show="!isShowGrouping">
+        <div>Group <input v-model="groupTotal" type="number" /></div>
+        <button @click="grouping" class="btn primary">
+          {{ groupTotal }} Group
+        </button>
+      </section>
+      <button
+        v-show="isShowGrouping"
+        @click="isShowGrouping = false"
+        class="btn primary"
+      >
         x Group
       </button>
       <button @click="isShowNumber = !isShowNumber" class="btn primary">
@@ -45,16 +53,29 @@
       <button @click="isShowTp = !isShowTp" class="btn primary">
         {{ isShowTp ? "Hide" : "Show" }} TP
       </button>
-      <button @click="sortBy()" class="btn primary">
-        Sort by: {{ sortType }}
+      <button @click="isShowTest = !isShowTest" class="btn primary">
+        {{ isShowTest ? "Hide" : "Show" }} Test
       </button>
+      <section v-show="isShowTest">
+        <button @click="updateTextSize('+')" class="btn primary">A+</button>
+        <button @click="updateTextSize('-')" class="btn primary">A-</button>
+      </section>
     </section>
   </div>
+
+  <textarea
+    v-model="test"
+    v-show="isShowTest"
+    :style="{ fontSize: textSize + 'px' }"
+    rows="10"
+    class="testBox"
+  >
+  </textarea>
 
   <!-- seat -->
   <div
     :class="{ group: isShowGrouping }"
-    :style="'grid-template-columns : repeat(' + groupTotal + ', 1fr)'"
+    :style="gridStyle"
     class="seats"
   >
     <Seat
@@ -71,7 +92,7 @@
       @skill="openModalSkill"
     />
   </div>
-  <div class="grouping">
+  <div v-if="isShowGrouping" class="grouping">
     <div
       @click="openModalTpForGroup(index)"
       v-for="(group, index) in groups"
@@ -86,7 +107,7 @@
           }}</span>
         </div>
       </div>
-      <pre>{{ group.tps }}</pre>
+      <pre>{{ group.tpStr }}</pre>
     </div>
   </div>
 
@@ -111,14 +132,6 @@
     @skills="skills"
     @close="isOpenModalRadar = false"
   />
-
-  <!-- Grouping
-  <ModalGroup
-    :open="isShowGrouping"
-    :students="datas"
-    @close="isShowGrouping = false"
-    @updateGroupTotal="updateGroupTotal"
-  /> -->
 
   <!-- keyboard -->
   <div v-show="isOpenKeyboard && teacherMode" class="keyboard">
@@ -148,12 +161,12 @@ export default defineComponent({
   components: {
     Seat,
     ModalTp,
-    ModalRadar
+    ModalRadar,
   },
   data() {
     return {
       password: "",
-      teacherMode: true, //
+      teacherMode: false, 
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -171,16 +184,26 @@ export default defineComponent({
       isShowNumber: false,
       sortType: "",
       isShowTp: false,
-      isShowGrouping: true, //
+      isShowGrouping: false,
       groupTotal: 5,
-      showOption: true, //
+      showOption: false,
       groups: [] as any,
       selectedGroup: {} as any,
+      isShowTest: false,
+      textSize: 16,
     };
+  },
+  computed: {
+    gridStyle() {
+      return {
+        gridTemplateColumns: `repeat(${Math.ceil(this.datas.length / this.groupTotal)}, 1fr)`
+      }  
+    },
   },
   setup(props) {
     const inputPassword = ref();
     let datas = ref([]);
+    let test = ref("");
     const url = `https://docs.google.com/spreadsheets/d/${props.sheetUrl}/gviz/tq?tqx=out:json`;
     let isDefaultEvalute = ref(false);
 
@@ -208,9 +231,17 @@ export default defineComponent({
         );
       });
 
+    fetch(url + "&sheet=Test")
+      .then((res) => res.text())
+      .then((rep) => {
+        const data = JSON.parse(rep.substring(47).slice(0, -2));
+        test.value = data.table.rows[1].c[0].v;
+      });
+
     return {
       inputPassword,
       datas,
+      test,
       scriptUrl: props.scriptUrl,
       isDefaultEvalute,
     };
@@ -279,30 +310,40 @@ export default defineComponent({
       this.selectedStudent = this.datas.find((d: any) => d.seat === val);
       this.isOpenModalTp = true;
     },
-    selectTp(val: string) {
-      let tempExp = 0;
-      if (this.selectedStudent.tp !== 0) {
-        tempExp = this.tpExps[this.selectedStudent.tp - 1];
-      }
-      // remove all tp
-      const aveTp = aveTpFn(val);
+    selectTp(obj: any) {
+      const tp = obj.val;
+      const type = obj.type;
+      // type === student
+      if (type === "student") {
+        let tempExp = 0;
+        if (this.selectedStudent.tp !== 0) {
+          tempExp = this.tpExps[this.selectedStudent.tp - 1];
+        }
+        // remove all tp
+        const aveTp = aveTpFn(tp);
 
-      if (aveTp === 0) {
-        this.selectedStudent.exp -= tempExp;
-        this.selectedStudent.tp = 0;
-        return;
-      }
-      this.selectedStudent.exp += this.tpExps[aveTp - 1] - tempExp;
-      this.selectedStudent.tp = aveTp;
-      this.selectedStudent.tpStr = val;
+        if (aveTp === 0) {
+          this.selectedStudent.exp -= tempExp;
+          this.selectedStudent.tp = 0;
+          return;
+        }
+        this.selectedStudent.exp += this.tpExps[aveTp - 1] - tempExp;
+        this.selectedStudent.tp = aveTp;
+        this.selectedStudent.tpStr = tp;
 
-      const sum = JSON.parse(this.selectedStudent.tpStr).reduce(
-        (v: number, t: number) => (t += v),
-        0
-      );
-      if (sum !== 0) {
-        this.isDefaultEvalute = false;
+        this.selectedStudent = {};
       }
+      // type === group
+      else if (type === "group") {
+        this.selectedGroup.tpStr = tp;
+        this.selectedGroup.students.forEach((s: any) => {
+          this.selectedStudent = s;
+          this.selectTp({ val: tp, type: "student" });
+        });
+        this.selectedGroup = {};
+      }
+      this.isOpenModalTp = false;
+      this.setDefaultEvalute();
     },
     singleExp(value: any) {
       this.datas.find((d: any) => d.seat === value.seat).exp += value.val;
@@ -380,7 +421,7 @@ export default defineComponent({
         } else if (this.keyboardOperator === "-") {
           this.selectedStudent.exp -= value;
         } else if (this.keyboardOperator === "*") {
-          this.selectTp(`[${value}]`);
+          this.selectTp({ val: `[${value}]`, type: "student" });
         }
         this.isOpenKeyboard = false;
         this.keyboard = "";
@@ -406,12 +447,13 @@ export default defineComponent({
     grouping() {
       this.isShowGrouping = true;
       this.groups = [];
+      const JSONTpStr = this.getTpStrDefault(this.evaluateCount);
 
       for (let i = 0; i < this.groupTotal; i++) {
         this.groups.push({
           students: [],
-          tps: [0],
-          name: this.indexToAlphabet(i)
+          tpStr: JSONTpStr === false ? "[0]" : JSONTpStr,
+          name: this.indexToAlphabet(i),
         });
       }
 
@@ -430,25 +472,61 @@ export default defineComponent({
       this.selectedGroup = this.groups[val];
       this.isOpenModalTp = true;
     },
+    getTpStrDefault(evaluateCount: number) {
+      const allZero = this.datas.every((d: any) => {
+        const sum = JSON.parse(d.tpStr).reduce(
+          (v: number, t: number) => (t += v),
+          0
+        );
+        return sum === 0;
+      });
+
+      if (allZero) {
+        const arr = [];
+        for (let i = 0; i < evaluateCount; i++) {
+          arr.push(0);
+        }
+        return JSON.stringify(arr);
+      }
+
+      return false;
+    },
+    setDefaultEvalute() {
+      // show or hide evalute input
+      const studentsSumTps = this.datas.every((d: any) => {
+        const sum = JSON.parse(d.tpStr).reduce(
+          (v: number, t: number) => (t += v),
+          0
+        );
+        return sum === 0;
+      });
+      const groupSumTps = this.groups.every((g: any) => {
+        const sum = JSON.parse(g.tpStr).reduce(
+          (v: number, t: number) => (t += v),
+          0
+        );
+        return sum === 0;
+      });
+      this.isDefaultEvalute = studentsSumTps && groupSumTps;
+    },
+    updateTextSize(val: string) {
+      if (val === "+") {
+        this.textSize++;
+      } else {
+        this.textSize--;
+      }
+    },
   },
   watch: {
     evaluateCount(newVal, oldVal) {
       if (newVal !== oldVal) {
-        const allZero = this.datas.every((d: any) => {
-          const sum = JSON.parse(d.tpStr).reduce(
-            (v: number, t: number) => (t += v),
-            0
-          );
-          return sum === 0;
-        });
-
-        if (allZero) {
-          const arr = [];
-          for (let i = 0; i < newVal; i++) {
-            arr.push(0);
-          }
-          const JSONTpStr = JSON.stringify(arr);
+        const JSONTpStr = this.getTpStrDefault(newVal);
+        if (JSONTpStr !== false) {
           this.datas.forEach((d: any) => (d.tpStr = JSONTpStr));
+        }
+
+        if (this.isShowGrouping) {
+          this.groups.forEach((d: any) => (d.tpStr = JSONTpStr));
         }
       }
     },
@@ -466,6 +544,9 @@ export default defineComponent({
     margin-top: 5px;
     & > * {
       margin-left: 5px;
+    }
+    & > section {
+      margin: 0;
     }
   }
 }
@@ -491,6 +572,7 @@ export default defineComponent({
   .group {
     border: 1px solid white;
     padding: 10px;
+    cursor: pointer;
     &:hover {
       border: 3px solid white;
     }
@@ -536,5 +618,14 @@ export default defineComponent({
   .saved {
     font-size: 100px;
   }
+}
+
+.testBox {
+  margin-top: 10px;
+  background-color: white;
+  color: black;
+  padding: 10px;
+  width: 100%;
+  resize: vertical;
 }
 </style>

@@ -148,6 +148,7 @@ export default defineComponent({
       }
     }
     transition: 0.3s;
+    transition-delay: 0.5s;
     &:hover {
       animation: shake 1s;
       animation-iteration-count: infinite;
@@ -247,6 +248,7 @@ export default defineComponent({
       background-color: black;
       height: 18px;
       transition: 1s;
+      transition-delay: 1s;
     }
     .number {
       font-size: 12px;

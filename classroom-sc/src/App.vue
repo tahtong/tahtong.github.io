@@ -19,7 +19,7 @@
       <input
         ref="inputPassword"
         v-model="password"
-        :style="{ 'opacity': selectedClassroom === '' ? 0.2 : 1 }"
+        :style="{ opacity: selectedClassroom === '' ? 0.2 : 1 }"
         type="password"
       />
       <button
@@ -57,10 +57,10 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedClassroom: "5H", //
-      selectedSheetUrl: "1h7I_XLNA4NnL91nUENt9N2tw3-xrqgxHVXm3dCaVlE4", //
-      selectedScriptUrl: "AKfycbxtsO4E6XdEaYqiLwr35s8G4GWw9b_9xLkTVh3AEwhtayf9N-kZFWYqLt8SLvH9cpFe", //
-      accessAble: true,
+      selectedClassroom: "",
+      selectedSheetUrl: "",
+      selectedScriptUrl: "",
+      accessAble: false,
       password: "",
       isPasswordWrong: false,
       sheetUrls: [
@@ -206,9 +206,9 @@ input {
   justify-content: center;
   align-items: center;
 }
-.btn.main{
+.btn.main {
   height: 50px;
-  width:100px;
+  width: 100px;
   font-size: 20px;
 }
 </style>
