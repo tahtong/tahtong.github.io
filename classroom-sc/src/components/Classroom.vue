@@ -73,11 +73,7 @@
   </textarea>
 
   <!-- seat -->
-  <div
-    :class="{ group: isShowGrouping }"
-    :style="gridStyle"
-    class="seats"
-  >
+  <div :class="{ group: isShowGrouping }" :style="gridStyle" class="seats">
     <Seat
       v-for="data in datas"
       :key="data.seat"
@@ -122,6 +118,7 @@
       (selectedStudent = {}), (selectedGroup = {});
     "
     @selectTp="selectTp"
+    @addExpByGroup="addExpByGroup"
   />
 
   <!-- ModalRadar -->
@@ -166,7 +163,7 @@ export default defineComponent({
   data() {
     return {
       password: "",
-      teacherMode: false, 
+      teacherMode: false,
       tpExps: [0, 0, 0, 2, 4, 6],
       datas: [] as any,
       isOpenModalTp: false,
@@ -190,14 +187,16 @@ export default defineComponent({
       groups: [] as any,
       selectedGroup: {} as any,
       isShowTest: false,
-      textSize: 16,
+      textSize: 20,
     };
   },
   computed: {
     gridStyle() {
       return {
-        gridTemplateColumns: `repeat(${Math.ceil(this.datas.length / this.groupTotal)}, 1fr)`
-      }  
+        gridTemplateColumns: `repeat(${Math.ceil(
+          this.datas.length / this.groupTotal
+        )}, 1fr)`,
+      };
     },
   },
   setup(props) {
@@ -348,6 +347,9 @@ export default defineComponent({
     singleExp(value: any) {
       this.datas.find((d: any) => d.seat === value.seat).exp += value.val;
     },
+    addExpByGroup(value: number) {
+      this.selectedGroup.students.forEach((s: any) => s.exp += value);
+    },
     absent(seat: any) {
       const student = this.datas.find((d: any) => d.seat === seat);
       student.absent = !student.absent;
@@ -447,6 +449,7 @@ export default defineComponent({
     grouping() {
       this.isShowGrouping = true;
       this.groups = [];
+      this.evaluateCount = this.datas[0].tpStr;
       const JSONTpStr = this.getTpStrDefault(this.evaluateCount);
 
       for (let i = 0; i < this.groupTotal; i++) {

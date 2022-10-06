@@ -23,6 +23,8 @@
           </button>
         </div>
         <div class="bottom">
+          <button @click="addExpByGroup(1)" class="btn">+1 Exp</button>
+          <button @click="addExpByGroup(-1)" class="btn">-1 Exp</button>
           <button @click="updateTp" class="btn">Update</button>
           <button @click="close" class="btn">Close</button>
         </div>
@@ -37,7 +39,7 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "ModalTp",
   props: ["open", "evaluateCount", "selectedStudent", "selectedGroup"],
-  emits: ["close", "selectTp"],
+  emits: ["close", "selectTp", "addExpByGroup"],
   setup(props) {
     const tps = ref<number[]>([]);
     for (let i = 0; i < props.evaluateCount; i++) {
@@ -64,6 +66,9 @@ export default defineComponent({
         val: JSON.stringify(this.tps),
         type: this.type,
       });
+    },
+    addExpByGroup(val: number) {
+      this.$emit("addExpByGroup", val);
     },
   },
   watch: {
