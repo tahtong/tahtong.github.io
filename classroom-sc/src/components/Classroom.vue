@@ -284,18 +284,20 @@ export default defineComponent({
     },
     allTp(val: number) {
       this.datas.forEach((d: any) => {
-        let tempExp = 0;
-        if (d.tp !== 0) {
-          tempExp = this.tpExps[d.tp - 1];
+        if (!d.absent) {
+          let tempExp = 0;
+          if (d.tp !== 0) {
+            tempExp = this.tpExps[d.tp - 1];
+          }
+          // remove all tp
+          if (val === 0) {
+            d.exp -= tempExp;
+            d.tp = 0;
+            return;
+          }
+          d.exp += this.tpExps[val - 1] - tempExp;
+          d.tp = val;
         }
-        // remove all tp
-        if (val === 0) {
-          d.exp -= tempExp;
-          d.tp = 0;
-          return;
-        }
-        d.exp += this.tpExps[val - 1] - tempExp;
-        d.tp = val;
       });
     },
     allExp(val: number) {
@@ -336,8 +338,10 @@ export default defineComponent({
       else if (type === "group") {
         this.selectedGroup.tpStr = tp;
         this.selectedGroup.students.forEach((s: any) => {
-          this.selectedStudent = s;
-          this.selectTp({ val: tp, type: "student" });
+          if (!s.absent) {
+            this.selectedStudent = s;
+            this.selectTp({ val: tp, type: "student" });
+          }
         });
         this.selectedGroup = {};
       }
@@ -348,7 +352,7 @@ export default defineComponent({
       this.datas.find((d: any) => d.seat === value.seat).exp += value.val;
     },
     addExpByGroup(value: number) {
-      this.selectedGroup.students.forEach((s: any) => s.exp += value);
+      this.selectedGroup.students.forEach((s: any) => (s.exp += value));
     },
     absent(seat: any) {
       const student = this.datas.find((d: any) => d.seat === seat);
@@ -460,11 +464,12 @@ export default defineComponent({
         });
       }
 
-      for (let i = 0; i < this.datas.length; i++) {
+      const presentStudents = this.datas.filter((s:any) => !s.absent);
+      for (let i = 0; i < presentStudents.length; i++) {
         const groupIndex = Math.floor(
-          i / Math.ceil(this.datas.length / this.groupTotal)
+          i / Math.ceil(presentStudents.length / this.groupTotal)
         );
-        this.groups[groupIndex].students.push(this.datas[i]);
+        this.groups[groupIndex].students.push(presentStudents[i]);
       }
     },
     indexToAlphabet(val: number) {
