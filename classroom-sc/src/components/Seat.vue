@@ -1,5 +1,12 @@
 <template>
-  <div :class="{ absent: data.absent, group: isShowGrouping }" class="seat">
+  <div
+    :class="{
+      absent: data.absent,
+      group: isShowGrouping,
+      homeWorkNotDone: data.homework !== null,
+    }"
+    class="seat"
+  >
     <div @click="skill(data.seat)" class="table">
       <div
         :class="'avatart-' + getLevelAndExp(data.exp).level"
@@ -24,6 +31,7 @@
       </div>
       <div v-show="isShowNumber" class="no">{{ data.no }}</div>
     </div>
+    <div class="homework">{{ data.homework }}</div>
     <div class="chair">
       <div class="expBar">
         <div
@@ -107,6 +115,11 @@ export default defineComponent({
 .seat {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 5px;
+  &:hover {
+    .homework {
+      display: block;
+    }
+  }
   &.absent {
     opacity: 0.2;
     button {
@@ -127,6 +140,10 @@ export default defineComponent({
         display: none;
       }
     }
+  }
+
+  &.homeWorkNotDone {
+    background: red;
   }
 }
 .table {
@@ -233,6 +250,11 @@ export default defineComponent({
     place-content: center;
     background-color: #111111;
   }
+}
+
+.homework {
+  display: none;
+  font-size: 14px;
 }
 .chair {
   .expBar {
