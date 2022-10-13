@@ -31,7 +31,7 @@
       </div>
       <div v-show="isShowNumber" class="no">{{ data.no }}</div>
     </div>
-    <div class="homework">{{ data.homework }}</div>
+    <div v-show="isShowHomework" class="homework">{{ data.homework }}</div>
     <div class="chair">
       <div class="expBar">
         <div
@@ -57,7 +57,14 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Seat",
-  props: ["data", "teacherMode", "isShowNumber", "isShowTp", "isShowGrouping"],
+  props: [
+    "data",
+    "teacherMode",
+    "isShowNumber",
+    "isShowTp",
+    "isShowGrouping",
+    "isShowHomework",
+  ],
   emits: ["tp", "exp", "absent", "skill"],
   data() {
     return {
@@ -115,11 +122,6 @@ export default defineComponent({
 .seat {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 5px;
-  &:hover {
-    .homework {
-      display: block;
-    }
-  }
   &.absent {
     opacity: 0.2;
     button {
@@ -253,7 +255,7 @@ export default defineComponent({
 }
 
 .homework {
-  display: none;
+  padding: 2px 4px;
   font-size: 14px;
 }
 .chair {

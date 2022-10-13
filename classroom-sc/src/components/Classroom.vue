@@ -4,6 +4,7 @@
     <section v-show="!teacherMode">
       <input ref="inputPassword" v-model="password" type="password" />
       <button @click="checkPassword(password)" class="btn primary">Run</button>
+      <button @click="isShowHomework = !isShowHomework" class="btn primary">Homework</button>
     </section>
     <!-- teacherMode = true -->
     <section v-show="teacherMode">
@@ -82,6 +83,7 @@
       :isShowNumber="isShowNumber"
       :isShowTp="isShowTp"
       :isShowGrouping="isShowGrouping"
+      :isShowHomework="isShowHomework"
       @tp="openModalTpForStudent"
       @exp="singleExp"
       @absent="absent"
@@ -188,6 +190,7 @@ export default defineComponent({
       selectedGroup: {} as any,
       isShowTest: false,
       textSize: 20,
+      isShowHomework: false,
     };
   },
   computed: {
