@@ -4,7 +4,9 @@
     <section v-show="!teacherMode">
       <input ref="inputPassword" v-model="password" type="password" />
       <button @click="checkPassword(password)" class="btn primary">Run</button>
-      <button @click="isShowHomework = !isShowHomework" class="btn primary">Homework</button>
+      <button @click="isShowHomework = !isShowHomework" class="btn primary">
+        Homework
+      </button>
     </section>
     <!-- teacherMode = true -->
     <section v-show="teacherMode">
@@ -397,6 +399,11 @@ export default defineComponent({
       this.isOpenKeyboard = true;
       this.keyboard += e.key;
 
+      if (e.key === ".") {
+        this.isOpenKeyboard = false;
+        this.keyboard = "";
+      }
+
       // this.keyboard.length === 2
       if (this.keyboard.length === 2) {
         this.selectedStudent = this.datas.find(
@@ -435,11 +442,6 @@ export default defineComponent({
         this.isOpenKeyboard = false;
         this.keyboard = "";
       }
-
-      if (e.key === ".") {
-        this.isOpenKeyboard = false;
-        this.keyboard = "";
-      }
     },
     sortBy() {
       if (this.sortType === "") {
@@ -467,7 +469,7 @@ export default defineComponent({
         });
       }
 
-      const presentStudents = this.datas.filter((s:any) => !s.absent);
+      const presentStudents = this.datas.filter((s: any) => !s.absent);
       for (let i = 0; i < presentStudents.length; i++) {
         const groupIndex = Math.floor(
           i / Math.ceil(presentStudents.length / this.groupTotal)
