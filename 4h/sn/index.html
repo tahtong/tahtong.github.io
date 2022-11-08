@@ -8,7 +8,7 @@
     <title>Document</title>
     <style>
         img {
-            width: 100%;
+            width: 2800px;
             display: block;
         }
 
@@ -38,16 +38,28 @@
     <img src="./img/2.jpg" alt="">
     <img src="./img/3.jpg" alt="">
     <img src="./img/4.jpg" alt="">
-    <img src="./img/5.jpg" alt="">
-    <img src="./img/6.jpg" alt="">
-    <img src="./img/7.jpg" alt="">
-    <img src="./img/8.jpg" alt="">
-    <img src="./img/9.jpg" alt="">
-    <img src="./img/10.jpg" alt="">
-    <img src="./img/11.jpg" alt="">
-    <img src="./img/12.jpg" alt="">
     <textarea class="topHide"></textarea>
     <textarea class="bottomHide"></textarea>
+    <div style="position: fixed; top:0; right:0;">
+      <button id="bigger">bigger</button>
+      <button id="smaller">smaller</button>
+    </div>
+  
+    <script>
+      let imageWidth = 1100;
+      document.getElementById('bigger').addEventListener('click', () => {
+        imageWidth = imageWidth + 100;
+        document.querySelectorAll('img').forEach((element) => {
+          element.style.width = imageWidth + 'px'
+        });
+      });
+      document.getElementById('smaller').addEventListener('click', () => {
+        imageWidth = imageWidth - 100;
+        document.querySelectorAll('img').forEach((element) => {
+          element.style.width = imageWidth + 'px'
+        });
+      });
+    </script>
 </body>
 
 </html>
