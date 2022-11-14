@@ -177,7 +177,7 @@ export default defineComponent({
       isShowResult: false,
       labels: ["未来目标", "理解力", "逻辑力", "自控力", "企业能力", "反思"],
       selectedTp: 4,
-      evaluateCount: 1,
+      evaluateCount: Number,
       isLoading: false,
       isOpenKeyboard: false,
       keyboard: "",
@@ -208,6 +208,7 @@ export default defineComponent({
     const inputPassword = ref();
     let datas = ref([]);
     let test = ref("");
+    let evaluateCount = ref(1);
     const url = `https://docs.google.com/spreadsheets/d/${props.sheetUrl}/gviz/tq?tqx=out:json`;
     let isDefaultEvalute = ref(false);
 
@@ -230,6 +231,7 @@ export default defineComponent({
       .then((res) => res.text())
       .then((rep) => {
         datas.value = jsonToObject(rep);
+        evaluateCount.value = (datas.value[0] as any).tpStr.split(',').length;
         isDefaultEvalute.value = datas.value.every(
           (d: any) => d.tpStr === "[0]"
         );
@@ -248,6 +250,7 @@ export default defineComponent({
       test,
       scriptUrl: props.scriptUrl,
       isDefaultEvalute,
+      evaluateCount
     };
   },
   mounted() {
