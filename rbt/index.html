@@ -8,68 +8,110 @@
     <title>RBT</title>
     <style>
         body {
-            margin: 0;
+            margin: 20px;
+        }
+
+        .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        a {
+            text-decoration: none;
+            border: 1px solid #222;
+            padding: 5px 10px;
+            display: block;
+            border-radius: 15px;
+            color: #222;
         }
 
         iframe {
             width: 100%;
             height: 100vh;
         }
+
+        img {
+            max-width: 100%;
+        }
+
+        ol {
+            padding-left: 15px;
+        }
     </style>
 </head>
 
 <body>
-    <a href="https://stackblitz.com/">stackblitz 开发工具（请选择 JS 黄色图标)</a>
-    <textarea id="textarea" style="width: 100%; height: 200px;">let timer;
-function fnFindId(id) {
-    return document.getElementById(id);
-}
-function fnClick(elem, callback) {
-    elem.addEventListener('click', callback);
-}
-function fnKeyup(callback) {
-    window.addEventListener('keyup', callback);
-}
-function fnRepeat(callback, second) {
-    let finalSecond = 1000;
-    finalSecond = second ? second * 1000 : finalSecond;
-    timer = setInterval(() => {
-    callback();
-    }, finalSecond);
-}
-function fnCountdown(callback, second) {
-    setTimeout(() => {
-    callback();
-    }, second * 1000);
-}
-function fnRemoveCountdown() {
-    clearInterval(timer);
-}</textarea>
+    <div class="links">
+        <a target="_blank" href="https://stackblitz.com/">stackblitz 开发工具（请选择 JS 黄色图标)</a>
+        <a target="_blank" href="https://js-1b43at.stackblitz.io">乘法表游戏 </a>
+        <a target="_blank" href="https://stackblitz.com/edit/js-1b43at?embed=1&file=index.js">乘法表游戏代码</a>
+        <a target="_blank" href="https://miro.com/app/board/uXjVPMOv24Y=/">流程图</a>
+        <a target="_blank" href="https://stackblitz.com/edit/js-3xgkcd">手速游戏</a>
+        <a target="_blank" href="https://js-qa2my7.stackblitz.io">算法游戏</a>
+        <a target="_blank" href="https://stackblitz.com/edit/js-qa2my7?file=index.js">算法游戏代码</a>
+        <a target="_blank" href="https://stackblitz.com/edit/js-dtm4sw?file=index.js">算法游戏代码 v2</a>
+        <a target="_blank" href="https://stackblitz.com/edit/typescript-u5w25u?file=index.ts">Icon Man Eat Coin 代码</a>
+        <a target="_blank" href="https://typescript-u5w25u.stackblitz.io">Icon Man Eat Coin 游戏</a>
+    </div>
 
-    <br>
-    <a href="https://js-1b43at.stackblitz.io">乘法表游戏 </a>
-    <a href="https://stackblitz.com/edit/js-1b43at?embed=1&file=index.js">乘法表游戏代码</a>
-    <a href="https://miro.com/app/board/uXjVPMOv24Y=/">流程图</a>
-    <a href="https://stackblitz.com/edit/js-3xgkcd">手速游戏</a>
-    <a href="https://js-qa2my7.stackblitz.io">算法游戏</a>
-    <a href="https://stackblitz.com/edit/js-qa2my7?file=index.js">算法游戏代码</a>
-    <a href="https://stackblitz.com/edit/js-dtm4sw?file=index.js">算法游戏代码 v2</a>
-    <a href="https://stackblitz.com/edit/typescript-u5w25u?file=index.ts">Icon Man Eat Coin 代码</a>
-    <a href="https://typescript-u5w25u.stackblitz.io">Icon Man Eat Coin 游戏</a>
+    <hr>
 
-    <iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450"
+    <div class="tutorial">
+        <ol>
+            <li>
+                <p>打开 “Icon Man Eat Coin 代码” 后点击 Fork （蓝色按钮）</p>
+                <img src="./github fork button.jpg">
+                <p>你可以尽情的修改代码，不会修改掉老师做好的代码。</p>
+                <p>抄下新的网址，如果你想要让老师看看你的作品。</p>
+            </li>
+            <li>
+                <p>本教程一共分为 5 个部分</p>
+                <ol>
+                    <li>Part A： 导入代码库，这是老师已经写好的代码。</li>
+                    <li>Part B： 制作容器，创建（new）和输入变量。</li>
+                    <li>Part C： 调用容器的方法。</li>
+                    <li>Part D： 老板制造方法 generateFunction 和 loopFunction。</li>
+                    <li>Part E： 开始游戏方法和动画（每一帧）的方法。</li>
+                </ol>
+            </li>
+            <li>
+                <h3>Part A</h3>
+                <img src="./partA.jpg">
+                <p>这里是老师已经写好的代码，学生们只需调用即可。<br>只需记得调用的名字（比如 MyGame），这编辑软件会自动“提示”你，接着只需选择提示就完成了。</p>
+                <p>class Coin extends Enemy 比较复杂，解释：制作一个新的类（class），扩展 Enemy 的类，取名叫“Coin”</p>
+                <p>*注意大小写</p>
+            </li>
+            <li>
+                <h3>Part B</h3>
+                <img src="./partB.jpg">
+                <p><b>const</b> 是容器，给容器取个名字 （const myGame）。<br /><b>=</b>（等于）是把右边的东西转进左边。<br /><b>new</b> 是创建，紧接着的是背起来的“类”。<br/><b>()</b>（香蕉）是放入“变量”。</p>
+                <p>变量是指改变结果的内容，比如改变坐标，宽度高度等。</p>
+            </li>
+            <li>
+                <h3>Part C</h3>
+                <img src="./partC.jpg">
+                <p>调用容器，比如 myGame.setTitle('跳跳吃金币') <br/>翻译成中文比较好理解 “<b>我的游戏 的 设置主题 成 跳跳吃金币</b>”</p>
+            </li>
+            <li>
+                <h3>Part D</h3>
+                <img src="./partD.jpg">
+                <p>这个比较复杂，建议先了解完 Part E 后在回来阅读。<br/>古老师在编写中……</p>
+            </li>
+            <li>
+                <h3>Part E</h3>
+                <img src="./partE.jpg">
+                <p>和 Part C 有点一样（调用容器），但是调用的工具名字结尾名是 Function 古老师在编写中……</p>
+            </li>
+        </ol>
+    </div>
+    <!-- <iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450"
         src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2FHCoSDtlmcSLMbrrWCEGhZR%2FRBT%3Fnode-id%3D0%253A1"
         allowfullscreen></iframe>
 
-    <iframe src="https://makecode.microbit.org/_0M9VVpURfa2w" frameborder="0"></iframe>
+    <iframe src="https://makecode.microbit.org/_0M9VVpURfa2w" frameborder="0"></iframe> -->
 
-    <script>
-        document.getElementById("textarea").onclick = function () {
-            document.getElementById("textarea").select();
-            document.execCommand('copy');
-            alert('古老师已经帮你拷贝（copy）好了，你现在只需要去粘贴（paste）就可以了。')
-        };
-    </script>
+
 </body>
 
 </html>
